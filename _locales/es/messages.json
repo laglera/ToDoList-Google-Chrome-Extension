@@ -1,0 +1,57 @@
+{
+  "extName": {
+    "message": "Todo List",
+    "description": "Nombre de la extensión"
+  },
+  "extDescription": {
+    "message": "Gestiona tu lista de tareas pendientes directamente desde el navegador."
+  },
+  "appTitle": {
+    "message": "Mis Tareas"
+  },
+  "newTaskLabel": {
+    "message": "Nueva tarea"
+  },
+  "newTaskPlaceholder": {
+    "message": "Añadir tarea…"
+  },
+  "enterHint": {
+    "message": "Intro",
+    "description": "Nombre de la tecla de confirmación en el teclado local"
+  },
+  "noTasks": {
+    "message": "Sin tareas"
+  },
+  "allDone": {
+    "message": "¡Todo hecho!"
+  },
+  "pendingOne": {
+    "message": "$COUNT$ pendiente de $TOTAL$",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "pendingMany": {
+    "message": "$COUNT$ pendientes de $TOTAL$",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "emptyState": {
+    "message": "Nada pendiente."
+  },
+  "deleteTask": {
+    "message": "Eliminar tarea"
+  },
+  "themeToggle": {
+    "message": "Cambiar tema"
+  },
+  "themeToLight": {
+    "message": "Cambiar a tema claro"
+  },
+  "themeToDark": {
+    "message": "Cambiar a tema oscuro"
+  }
+}

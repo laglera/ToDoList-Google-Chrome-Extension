@@ -1,0 +1,57 @@
+{
+  "extName": {
+    "message": "Todo List",
+    "description": "Nome dell'estensione"
+  },
+  "extDescription": {
+    "message": "Gestisci la tua lista di cose da fare direttamente dal browser."
+  },
+  "appTitle": {
+    "message": "Le mie attività"
+  },
+  "newTaskLabel": {
+    "message": "Nuova attività"
+  },
+  "newTaskPlaceholder": {
+    "message": "Aggiungi attività…"
+  },
+  "enterHint": {
+    "message": "Invio",
+    "description": "Nome del tasto di conferma sulla tastiera locale"
+  },
+  "noTasks": {
+    "message": "Nessuna attività"
+  },
+  "allDone": {
+    "message": "Tutto fatto!"
+  },
+  "pendingOne": {
+    "message": "$COUNT$ di $TOTAL$ da fare",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "pendingMany": {
+    "message": "$COUNT$ di $TOTAL$ da fare",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "emptyState": {
+    "message": "Niente in sospeso."
+  },
+  "deleteTask": {
+    "message": "Elimina attività"
+  },
+  "themeToggle": {
+    "message": "Cambia tema"
+  },
+  "themeToLight": {
+    "message": "Passa al tema chiaro"
+  },
+  "themeToDark": {
+    "message": "Passa al tema scuro"
+  }
+}

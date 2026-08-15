@@ -1,0 +1,57 @@
+{
+  "extName": {
+    "message": "Todo List",
+    "description": "Nom de l'extension"
+  },
+  "extDescription": {
+    "message": "Gérez votre liste de tâches directement depuis le navigateur."
+  },
+  "appTitle": {
+    "message": "Mes tâches"
+  },
+  "newTaskLabel": {
+    "message": "Nouvelle tâche"
+  },
+  "newTaskPlaceholder": {
+    "message": "Ajouter une tâche…"
+  },
+  "enterHint": {
+    "message": "Entrée",
+    "description": "Nom de la touche de validation sur le clavier local"
+  },
+  "noTasks": {
+    "message": "Aucune tâche"
+  },
+  "allDone": {
+    "message": "Tout est fait !"
+  },
+  "pendingOne": {
+    "message": "$COUNT$ sur $TOTAL$ restante",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "pendingMany": {
+    "message": "$COUNT$ sur $TOTAL$ restantes",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "emptyState": {
+    "message": "Rien en attente."
+  },
+  "deleteTask": {
+    "message": "Supprimer la tâche"
+  },
+  "themeToggle": {
+    "message": "Changer de thème"
+  },
+  "themeToLight": {
+    "message": "Passer au thème clair"
+  },
+  "themeToDark": {
+    "message": "Passer au thème sombre"
+  }
+}

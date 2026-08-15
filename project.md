@@ -21,10 +21,17 @@ Extensión de Google Chrome que permite gestionar una lista de tareas pendientes
 todo-extension/
 ├── manifest.json     # Configuración de la extensión
 ├── popup.html        # Interfaz del popup
-├── popup.css          # Estilos
-├── popup.js          # Lógica (añadir, completar, eliminar, guardar)
+├── popup.css          # Estilos (tema claro y oscuro)
+├── popup.js          # Lógica (añadir, completar, eliminar, guardar, tema, i18n)
+├── _locales/          # Textos traducidos (es, en, fr, de, it, pt_BR)
+│   └── <idioma>/messages.json
 └── icons/             # Iconos de la extensión (16, 48, 128 px)
 ```
+
+## Adaptación automática al usuario
+- **Tema:** sigue el modo claro/oscuro del sistema (`prefers-color-scheme`) y reacciona en vivo a los cambios. El botón de la cabecera permite forzar uno; la elección se guarda en `chrome.storage.local` bajo la clave `theme`.
+- **Idioma:** la interfaz se traduce con `chrome.i18n` según el idioma de Chrome (heredado del sistema). Idiomas incluidos: español (por defecto), inglés, francés, alemán, italiano y portugués de Brasil. Cualquier otro idioma cae en español.
+- Para añadir un idioma basta con copiar `_locales/es/messages.json` a `_locales/<código>/` y traducir los valores de `message`.
 
 ## Modelo de datos
 Cada tarea se representa como un objeto:
@@ -39,7 +46,7 @@ Las tareas se guardan como un array en `chrome.storage.local`.
 
 ## Flujo de uso
 1. El usuario abre la extensión haciendo clic en el icono de la barra de Chrome.
-2. Escribe una tarea en el input y pulsa "Añadir" (o Enter).
+2. Escribe una tarea en el input y pulsa Enter.
 3. La tarea aparece en la lista.
 4. Al hacer clic sobre una tarea (o su checkbox), se marca como completada (tachado/estilo distinto).
 5. Al hacer clic en el icono de eliminar, la tarea desaparece de la lista y del storage.

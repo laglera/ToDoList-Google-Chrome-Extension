@@ -1,0 +1,57 @@
+{
+  "extName": {
+    "message": "Todo List",
+    "description": "Name der Erweiterung"
+  },
+  "extDescription": {
+    "message": "Verwalte deine Aufgabenliste direkt im Browser."
+  },
+  "appTitle": {
+    "message": "Meine Aufgaben"
+  },
+  "newTaskLabel": {
+    "message": "Neue Aufgabe"
+  },
+  "newTaskPlaceholder": {
+    "message": "Aufgabe hinzufügen…"
+  },
+  "enterHint": {
+    "message": "Enter",
+    "description": "Name der Bestätigungstaste auf der lokalen Tastatur"
+  },
+  "noTasks": {
+    "message": "Keine Aufgaben"
+  },
+  "allDone": {
+    "message": "Alles erledigt!"
+  },
+  "pendingOne": {
+    "message": "$COUNT$ von $TOTAL$ offen",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "pendingMany": {
+    "message": "$COUNT$ von $TOTAL$ offen",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "emptyState": {
+    "message": "Nichts offen."
+  },
+  "deleteTask": {
+    "message": "Aufgabe löschen"
+  },
+  "themeToggle": {
+    "message": "Design wechseln"
+  },
+  "themeToLight": {
+    "message": "Zum hellen Design wechseln"
+  },
+  "themeToDark": {
+    "message": "Zum dunklen Design wechseln"
+  }
+}

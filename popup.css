@@ -4,9 +4,9 @@
   padding: 0;
 }
 
+/* Tema claro (por defecto) */
 :root {
-  --backdrop: #414141;
-  --card: #ffffff;
+  --bg: #ffffff;
   --pill: #dcdcdc;
   --pill-hover: #d2d2d2;
   --text: #101010;
@@ -14,46 +14,60 @@
   --accent: #2b7cf6;
   --accent-hover: #1a6ae8;
   --danger: #d24b4b;
+  --hover-layer: rgba(0, 0, 0, 0.06);
 }
 
+/* Tema oscuro por preferencia del sistema (mientras no se fije uno a mano) */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --backdrop: #0e0f11;
-    --card: #1c1d20;
+  :root:not([data-theme="light"]) {
+    --bg: #1c1d20;
     --pill: #2b2d31;
     --pill-hover: #34363b;
     --text: #f2f3f5;
     --text-muted: #8b8f96;
+    --hover-layer: rgba(255, 255, 255, 0.08);
   }
 }
 
+/* Tema oscuro elegido a mano: gana sobre el del sistema */
+:root[data-theme="dark"] {
+  --bg: #1c1d20;
+  --pill: #2b2d31;
+  --pill-hover: #34363b;
+  --text: #f2f3f5;
+  --text-muted: #8b8f96;
+  --hover-layer: rgba(255, 255, 255, 0.08);
+}
+
+/* El color llega hasta el borde: el redondeo lo dibuja el propio popup de Chrome */
+html {
+  background: var(--bg);
+}
+
 body {
+  display: flex;
+  flex-direction: column;
   width: 360px;
-  padding: 14px;
-  background: var(--backdrop);
+  min-height: 420px;
+  padding: 20px 18px 22px;
+  background: var(--bg);
+  color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Tarjeta blanca sobre el fondo */
-.card {
-  display: flex;
-  flex-direction: column;
-  min-height: 400px;
-  padding: 20px 18px 22px;
-  border-radius: 26px;
-  background: var(--card);
-  color: var(--text);
-}
-
-/* Cabecera: título grande + botón redondo */
+/* Cabecera: título grande + acciones */
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 18px;
+}
+
+.header__text {
+  flex: 1;
+  min-width: 0;
 }
 
 .title {
@@ -70,57 +84,94 @@ body {
   color: var(--text-muted);
 }
 
-.add-button {
+/* Botón de tema */
+.theme-button {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+  background: none;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.add-button:hover {
-  background: var(--accent-hover);
+.theme-button:hover {
+  background: var(--hover-layer);
+  color: var(--text);
 }
 
-.add-button:active {
-  transform: scale(0.94);
-}
-
-.add-button:focus-visible {
+.theme-button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.add-button svg {
-  width: 20px;
-  height: 20px;
+.theme-button .icon {
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.4;
+  stroke-width: 1.8;
   stroke-linecap: round;
 }
 
-/* Campo de entrada: misma píldora que las tareas, en versión hueca */
+/* Se muestra el icono del tema al que se cambiará */
+.icon--sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .icon--sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .icon--moon {
+  display: none;
+}
+
+/* Campo de entrada: única forma de añadir, se envía con Enter */
 .new-task {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--pill);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.new-task:focus-within {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.new-task__icon {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: stroke 0.15s ease;
+}
+
+.new-task:focus-within .new-task__icon {
+  stroke: var(--accent);
 }
 
 .new-task__input {
-  width: 100%;
-  padding: 15px 20px;
-  border: 1.5px dashed var(--pill);
-  border-radius: 999px;
+  flex: 1;
+  min-width: 0;
+  border: none;
   background: none;
   color: var(--text);
   font: inherit;
-  transition: border-color 0.15s ease;
 }
 
 .new-task__input::placeholder {
@@ -129,8 +180,23 @@ body {
 
 .new-task__input:focus {
   outline: none;
-  border-style: solid;
-  border-color: var(--accent);
+}
+
+/* Pista de teclado: sólo aparece cuando hay algo escrito que enviar */
+.new-task__hint {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--hover-layer);
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.new-task:focus-within .new-task__hint {
+  opacity: 1;
 }
 
 /* Lista de tareas como píldoras */
@@ -139,7 +205,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 330px;
+  max-height: 340px;
   overflow-y: auto;
 }
 

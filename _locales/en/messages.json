@@ -1,0 +1,57 @@
+{
+  "extName": {
+    "message": "Todo List",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Manage your to-do list right from the browser."
+  },
+  "appTitle": {
+    "message": "My Tasks"
+  },
+  "newTaskLabel": {
+    "message": "New task"
+  },
+  "newTaskPlaceholder": {
+    "message": "Add a task…"
+  },
+  "enterHint": {
+    "message": "Enter",
+    "description": "Name of the confirmation key on the local keyboard"
+  },
+  "noTasks": {
+    "message": "No tasks"
+  },
+  "allDone": {
+    "message": "All done!"
+  },
+  "pendingOne": {
+    "message": "$COUNT$ of $TOTAL$ left",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "pendingMany": {
+    "message": "$COUNT$ of $TOTAL$ left",
+    "placeholders": {
+      "count": { "content": "$1" },
+      "total": { "content": "$2" }
+    }
+  },
+  "emptyState": {
+    "message": "Nothing pending."
+  },
+  "deleteTask": {
+    "message": "Delete task"
+  },
+  "themeToggle": {
+    "message": "Switch theme"
+  },
+  "themeToLight": {
+    "message": "Switch to light theme"
+  },
+  "themeToDark": {
+    "message": "Switch to dark theme"
+  }
+}
