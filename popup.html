@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Todo List</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="card">
+      <header class="header">
+        <div class="header__text">
+          <h1 class="title">Mis Tareas</h1>
+          <p class="counter" id="counter" aria-live="polite">Sin tareas</p>
+        </div>
+        <button
+          class="add-button"
+          type="submit"
+          form="new-task-form"
+          aria-label="Añadir tarea"
+          title="Añadir tarea"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </header>
+
+      <form class="new-task" id="new-task-form" autocomplete="off">
+        <input
+          class="new-task__input"
+          id="new-task-input"
+          type="text"
+          placeholder="Añadir tarea…"
+          aria-label="Nueva tarea"
+          maxlength="200"
+          required
+        />
+      </form>
+
+      <ul class="task-list" id="task-list"></ul>
+
+      <p class="empty" id="empty-state" hidden>Nada pendiente.</p>
+    </div>
+
+    <template id="task-template">
+      <li class="task">
+        <label class="task__label">
+          <input class="task__checkbox" type="checkbox" />
+          <span class="task__text"></span>
+        </label>
+        <button class="task__delete" type="button" aria-label="Eliminar tarea" title="Eliminar tarea">
+          <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+            <path d="M1.5 1.5l9 9M10.5 1.5l-9 9" />
+          </svg>
+        </button>
+      </li>
+    </template>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
