@@ -257,7 +257,7 @@ systemDark.addEventListener("change", () => {
   if (theme === null) applyTheme();
 });
 
-// Mantiene el popup sincronizado si el storage cambia desde otra ventana
+// Mantiene el panel sincronizado si el storage cambia desde otra ventana
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
 
