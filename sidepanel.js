@@ -1,7 +1,11 @@
 "use strict";
 
 const STORAGE_KEY = "tasks";
+const PROJECTS_KEY = "projects";
 const THEME_KEY = "theme";
+
+/** Id especial del filtro "Todas" (no es un proyecto real) */
+const ALL_ID = "__all__";
 
 const form = document.getElementById("new-task-form");
 const input = document.getElementById("new-task-input");
@@ -10,9 +14,17 @@ const counter = document.getElementById("counter");
 const emptyState = document.getElementById("empty-state");
 const template = document.getElementById("task-template");
 const themeButton = document.getElementById("theme-button");
+const projectsNav = document.getElementById("projects");
+const projectChipTemplate = document.getElementById("project-chip-template");
 
-/** @type {{id: string, text: string, completed: boolean}[]} */
+/** @type {{id: string, text: string, completed: boolean, projectId: string|null}[]} */
 let tasks = [];
+
+/** @type {{id: string, name: string}[]} */
+let projects = [];
+
+/** Proyecto activo: ALL_ID, null (sin proyecto) o el id de un proyecto */
+let selectedProjectId = ALL_ID;
 
 /** Tema elegido a mano ("light" | "dark"), o null si se sigue al sistema */
 let theme = null;
@@ -65,6 +77,16 @@ async function saveTasks() {
   await chrome.storage.local.set({ [STORAGE_KEY]: tasks });
 }
 
+async function loadProjects() {
+  const data = await chrome.storage.local.get(PROJECTS_KEY);
+  const stored = data[PROJECTS_KEY];
+  projects = Array.isArray(stored) ? stored : [];
+}
+
+async function saveProjects() {
+  await chrome.storage.local.set({ [PROJECTS_KEY]: projects });
+}
+
 /* --- Tema --- */
 
 async function loadTheme() {
@@ -92,7 +114,8 @@ async function toggleTheme() {
 /* --- Acciones --- */
 
 async function addTask(text) {
-  tasks.push({ id: crypto.randomUUID(), text, completed: false });
+  const projectId = selectedProjectId === ALL_ID ? null : selectedProjectId;
+  tasks.push({ id: crypto.randomUUID(), text, completed: false, projectId });
   await saveTasks();
   render();
 }
@@ -117,6 +140,96 @@ async function editTask(id, text) {
   task.text = text;
   await saveTasks();
   render();
+}
+
+/* --- Proyectos --- */
+
+async function addProject(name) {
+  const project = { id: crypto.randomUUID(), name };
+  projects.push(project);
+  await saveProjects();
+  selectedProjectId = project.id;
+  render();
+}
+
+async function deleteProject(id) {
+  projects = projects.filter((project) => project.id !== id);
+  await saveProjects();
+
+  // Las tareas del proyecto borrado quedan sin proyecto, no se eliminan
+  let tasksChanged = false;
+  for (const task of tasks) {
+    if (task.projectId === id) {
+      task.projectId = null;
+      tasksChanged = true;
+    }
+  }
+  if (tasksChanged) await saveTasks();
+
+  if (selectedProjectId === id) selectedProjectId = ALL_ID;
+  render();
+}
+
+function selectProject(id) {
+  if (selectedProjectId === id) return;
+  selectedProjectId = id;
+  render();
+}
+
+/** true mientras se muestra el campo para escribir el nombre del nuevo proyecto */
+let isAddingProject = false;
+
+function renderProjects() {
+  projectsNav.replaceChildren();
+
+  // El filtro "Todas" sólo tiene sentido si ya existe algún proyecto entre el que elegir
+  if (projects.length > 0) {
+    projectsNav.append(buildProjectChip(ALL_ID, msg("allProjects", "Todas"), false));
+  }
+
+  for (const project of projects) {
+    projectsNav.append(buildProjectChip(project.id, project.name, true));
+  }
+
+  // El botón "+" siempre está disponible, incluso sin proyectos, para poder crear el primero
+  projectsNav.append(isAddingProject ? buildProjectInput() : buildAddProjectChip());
+}
+
+function buildProjectChip(id, label, deletable) {
+  const chip = projectChipTemplate.content.firstElementChild.cloneNode(true);
+  chip.dataset.id = id;
+  chip.classList.toggle("project-chip--active", selectedProjectId === id);
+  chip.querySelector(".project-chip__label").textContent = label;
+
+  const deleteBtn = chip.querySelector(".project-chip__delete");
+  if (deletable && selectedProjectId === id) {
+    deleteBtn.hidden = false;
+  } else {
+    deleteBtn.remove();
+  }
+
+  applyI18n(chip);
+  return chip;
+}
+
+function buildAddProjectChip() {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "project-chip project-chip--add";
+  const label = msg("addProject", "Añadir proyecto");
+  button.title = label;
+  button.setAttribute("aria-label", label);
+  button.textContent = "+";
+  return button;
+}
+
+function buildProjectInput() {
+  const field = document.createElement("input");
+  field.type = "text";
+  field.className = "project-input";
+  field.placeholder = msg("newProjectPlaceholder", "Nombre del proyecto");
+  field.maxLength = 40;
+  return field;
 }
 
 /* --- Edición en línea --- */
@@ -173,10 +286,19 @@ function startEditing(item) {
 
 /* --- Renderizado --- */
 
-function render() {
-  list.replaceChildren();
+function visibleTasks() {
+  return selectedProjectId === ALL_ID
+    ? tasks
+    : tasks.filter((task) => task.projectId === selectedProjectId);
+}
 
-  for (const task of tasks) {
+function render() {
+  renderProjects();
+
+  list.replaceChildren();
+  const filtered = visibleTasks();
+
+  for (const task of filtered) {
     const item = template.content.firstElementChild.cloneNode(true);
     item.dataset.id = task.id;
     item.classList.toggle("task--completed", task.completed);
@@ -187,27 +309,35 @@ function render() {
     // textContent (nunca innerHTML) para que el texto del usuario no se interprete como HTML
     item.querySelector(".task__text").textContent = task.text;
 
+    // La etiqueta de proyecto sólo aporta información al ver "Todas" a la vez
+    const projectBadge = item.querySelector(".task__project");
+    const project = task.projectId && projects.find((p) => p.id === task.projectId);
+    if (selectedProjectId === ALL_ID && project) {
+      projectBadge.textContent = project.name;
+      projectBadge.hidden = false;
+    }
+
     applyI18n(item);
     list.append(item);
   }
 
-  emptyState.hidden = tasks.length > 0;
-  updateCounter();
+  emptyState.hidden = filtered.length > 0;
+  updateCounter(filtered);
 }
 
-function updateCounter() {
-  if (tasks.length === 0) {
+function updateCounter(filtered) {
+  if (filtered.length === 0) {
     counter.textContent = msg("noTasks", "Sin tareas");
     return;
   }
 
-  const pending = tasks.filter((task) => !task.completed).length;
+  const pending = filtered.filter((task) => !task.completed).length;
   if (pending === 0) {
     counter.textContent = msg("allDone", "¡Todo hecho!");
     return;
   }
 
-  const total = String(tasks.length);
+  const total = String(filtered.length);
   counter.textContent = msg(
     pending === 1 ? "pendingOne" : "pendingMany",
     `${pending} pendiente${pending === 1 ? "" : "s"} de ${total}`,
@@ -250,6 +380,51 @@ list.addEventListener("change", (event) => {
   if (item) toggleTask(item.dataset.id);
 });
 
+projectsNav.addEventListener("click", (event) => {
+  if (event.target.closest(".project-chip--add")) {
+    isAddingProject = true;
+    render();
+    projectsNav.querySelector(".project-input")?.focus();
+    return;
+  }
+
+  const deleteBtn = event.target.closest(".project-chip__delete");
+  if (deleteBtn) {
+    deleteProject(deleteBtn.closest(".project-chip").dataset.id);
+    return;
+  }
+
+  const select = event.target.closest(".project-chip__select");
+  if (select) selectProject(select.closest(".project-chip").dataset.id);
+});
+
+function commitNewProject(event) {
+  const name = event.target.value.trim().slice(0, 40);
+  isAddingProject = false;
+  if (name) {
+    addProject(name);
+  } else {
+    render();
+  }
+}
+
+projectsNav.addEventListener("keydown", (event) => {
+  if (!event.target.classList.contains("project-input")) return;
+  if (event.key === "Enter") {
+    event.preventDefault();
+    commitNewProject(event);
+  } else if (event.key === "Escape") {
+    event.preventDefault();
+    isAddingProject = false;
+    render();
+  }
+});
+
+projectsNav.addEventListener("focusout", (event) => {
+  if (!isAddingProject || !event.target.classList.contains("project-input")) return;
+  commitNewProject(event);
+});
+
 themeButton.addEventListener("click", toggleTheme);
 
 // Mientras no haya un tema elegido a mano, se sigue al del sistema en vivo
@@ -264,6 +439,15 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (changes[STORAGE_KEY]) {
     const value = changes[STORAGE_KEY].newValue;
     tasks = Array.isArray(value) ? value : [];
+    render();
+  }
+
+  if (changes[PROJECTS_KEY]) {
+    const value = changes[PROJECTS_KEY].newValue;
+    projects = Array.isArray(value) ? value : [];
+    if (selectedProjectId !== ALL_ID && !projects.some((p) => p.id === selectedProjectId)) {
+      selectedProjectId = ALL_ID;
+    }
     render();
   }
 
@@ -282,7 +466,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
   await loadTheme();
   applyTheme();
-  await loadTasks();
+  await Promise.all([loadTasks(), loadProjects()]);
   render();
   input.focus();
 })();

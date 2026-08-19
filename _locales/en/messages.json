@@ -64,5 +64,17 @@
   },
   "themeToDark": {
     "message": "Switch to dark theme"
+  },
+  "allProjects": {
+    "message": "All"
+  },
+  "addProject": {
+    "message": "Add project"
+  },
+  "newProjectPlaceholder": {
+    "message": "Project name"
+  },
+  "deleteProject": {
+    "message": "Delete project"
   }
 }

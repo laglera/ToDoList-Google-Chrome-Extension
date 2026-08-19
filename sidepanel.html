@@ -31,6 +31,8 @@
       </button>
     </header>
 
+    <nav class="projects" id="projects" aria-label="Proyectos"></nav>
+
     <form class="new-task" id="new-task-form" autocomplete="off">
       <svg class="new-task__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M12 5v14M5 12h14" />
@@ -59,6 +61,7 @@
         <label class="task__label">
           <input class="task__checkbox" type="checkbox" />
           <span class="task__text"></span>
+          <span class="task__project" hidden></span>
         </label>
         <button
           class="task__edit"
@@ -87,6 +90,27 @@
           </svg>
         </button>
       </li>
+    </template>
+
+    <template id="project-chip-template">
+      <span class="project-chip">
+        <button type="button" class="project-chip__select">
+          <span class="project-chip__label"></span>
+        </button>
+        <button
+          type="button"
+          class="project-chip__delete"
+          aria-label="Eliminar proyecto"
+          title="Eliminar proyecto"
+          data-i18n-aria-label="deleteProject"
+          data-i18n-title="deleteProject"
+          hidden
+        >
+          <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+            <path d="M1.5 1.5l9 9M10.5 1.5l-9 9" />
+          </svg>
+        </button>
+      </span>
     </template>
 
     <script src="sidepanel.js"></script>

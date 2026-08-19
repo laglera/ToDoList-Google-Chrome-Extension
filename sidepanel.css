@@ -133,6 +133,127 @@ body {
   display: none;
 }
 
+/* Proyectos: filtro y categorización de las tareas */
+.projects {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.projects::-webkit-scrollbar {
+  display: none;
+}
+
+.project-chip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  height: 30px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--pill);
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.project-chip:hover {
+  background: var(--pill-hover);
+}
+
+.project-chip--active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.project-chip--active:hover {
+  background: var(--accent-hover);
+}
+
+.project-chip__select {
+  display: flex;
+  align-items: center;
+  border: none;
+  background: none;
+  padding: 0 12px;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.project-chip__select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Botón "+" independiente: no forma parte de un .project-chip con selector/borrado */
+.project-chip--add {
+  border: none;
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0 13px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.project-chip--add:hover {
+  background: var(--pill-hover);
+}
+
+.project-chip--add:focus-visible,
+.project-chip__delete:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.project-chip__delete {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  border: none;
+  background: none;
+  padding: 0 8px 0 0;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.project-chip__delete:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.project-chip__delete svg {
+  width: 8px;
+  height: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.project-input {
+  flex-shrink: 0;
+  width: 120px;
+  height: 30px;
+  padding: 0 12px;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.project-input:focus {
+  outline: none;
+}
+
 /* Campo de entrada: única forma de añadir, se envía con Enter */
 .new-task {
   display: flex;
@@ -285,6 +406,18 @@ body {
   color: var(--text-muted);
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
+}
+
+/* Etiqueta de proyecto: sólo visible mientras se ven las tareas de todos los proyectos */
+.task__project {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--hover-layer);
+  color: var(--text-muted);
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 /* Botones de editar/borrar: ocultos hasta apuntar la tarea o llegar por teclado */

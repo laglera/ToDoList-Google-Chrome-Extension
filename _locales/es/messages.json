@@ -64,5 +64,17 @@
   },
   "themeToDark": {
     "message": "Cambiar a tema oscuro"
+  },
+  "allProjects": {
+    "message": "Todas"
+  },
+  "addProject": {
+    "message": "Añadir proyecto"
+  },
+  "newProjectPlaceholder": {
+    "message": "Nombre del proyecto"
+  },
+  "deleteProject": {
+    "message": "Eliminar proyecto"
   }
 }
