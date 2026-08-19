@@ -182,6 +182,7 @@ body {
 .rail-icon__select {
   width: 100%;
   height: 100%;
+  overflow: hidden;
   border: none;
   border-radius: 50%;
   background: var(--pill);
@@ -194,6 +195,12 @@ body {
   letter-spacing: 0.02em;
   cursor: pointer;
   transition: border-radius 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.rail-icon__label img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .rail-icon__select:hover {
@@ -216,28 +223,51 @@ body {
   outline-offset: 2px;
 }
 
+.rail-icon__edit,
 .rail-icon__delete {
   position: absolute;
   top: -4px;
-  right: -4px;
   width: 18px;
   height: 18px;
   display: grid;
   place-items: center;
   border: 2px solid var(--rail-bg);
   border-radius: 50%;
-  background: var(--danger);
   color: #fff;
   cursor: pointer;
+}
+
+.rail-icon__edit {
+  left: -4px;
+  background: var(--accent);
+}
+
+.rail-icon__edit:hover {
+  background: var(--accent-hover);
+}
+
+.rail-icon__delete {
+  right: -4px;
+  background: var(--danger);
 }
 
 .rail-icon__delete:hover {
   background: #b83b3b;
 }
 
+.rail-icon__edit:focus-visible,
 .rail-icon__delete:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
+}
+
+.rail-icon__edit svg {
+  width: 8px;
+  height: 8px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
 .rail-icon__delete svg {
@@ -289,11 +319,11 @@ body {
   outline-offset: 2px;
 }
 
+/* position:fixed y no absolute: el riel necesita scroll vertical, y CSS obliga a que un
+   eje con overflow "auto" recorte también el otro si no está fijado fuera de ese contexto */
 .rail-project-input {
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  z-index: 5;
+  position: fixed;
+  z-index: 50;
   width: 160px;
   height: 36px;
   padding: 0 12px;
@@ -309,6 +339,163 @@ body {
 
 .rail-project-input:focus {
   outline: none;
+}
+
+/* Popover de edición de proyecto: nombre + imagen del icono */
+.project-edit {
+  position: fixed;
+  z-index: 50;
+  width: 200px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--hover-layer);
+  border-radius: 14px;
+  background: var(--bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  transform: translateY(-50%);
+}
+
+.project-edit__avatar {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 50%;
+  background: var(--pill);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.project-edit__avatar-content {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.project-edit__avatar-content img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-edit__avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.project-edit__avatar:hover .project-edit__avatar-overlay,
+.project-edit__avatar:focus-visible .project-edit__avatar-overlay {
+  opacity: 1;
+}
+
+.project-edit__avatar-overlay svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.project-edit__avatar:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.project-edit__name {
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.project-edit__name:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.project-edit__remove-icon {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.project-edit__remove-icon:hover {
+  color: var(--danger);
+}
+
+.project-edit__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.project-edit__cancel,
+.project-edit__save {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.project-edit__cancel {
+  background: none;
+  color: var(--text-muted);
+}
+
+.project-edit__cancel:hover {
+  background: var(--hover-layer);
+  color: var(--text);
+}
+
+.project-edit__save {
+  background: var(--accent);
+  color: #fff;
+}
+
+.project-edit__save:hover {
+  background: var(--accent-hover);
+}
+
+.project-edit__cancel:focus-visible,
+.project-edit__save:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Campo de entrada: única forma de añadir, se envía con Enter */

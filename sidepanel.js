@@ -16,11 +16,12 @@ const template = document.getElementById("task-template");
 const themeButton = document.getElementById("theme-button");
 const projectsNav = document.getElementById("projects");
 const railIconTemplate = document.getElementById("rail-icon-template");
+const projectEditTemplate = document.getElementById("project-edit-template");
 
 /** @type {{id: string, text: string, completed: boolean, projectId: string|null}[]} */
 let tasks = [];
 
-/** @type {{id: string, name: string}[]} */
+/** @type {{id: string, name: string, icon?: string|null}[]} */
 let projects = [];
 
 /** Proyecto activo: ALL_ID, null (sin proyecto) o el id de un proyecto */
@@ -117,7 +118,7 @@ async function addTask(text) {
   const projectId = selectedProjectId === ALL_ID ? null : selectedProjectId;
   tasks.push({ id: crypto.randomUUID(), text, completed: false, projectId });
   await saveTasks();
-  render();
+  renderTasks();
 }
 
 async function toggleTask(id) {
@@ -125,13 +126,13 @@ async function toggleTask(id) {
   if (!task) return;
   task.completed = !task.completed;
   await saveTasks();
-  render();
+  renderTasks();
 }
 
 async function deleteTask(id) {
   tasks = tasks.filter((item) => item.id !== id);
   await saveTasks();
-  render();
+  renderTasks();
 }
 
 async function editTask(id, text) {
@@ -139,7 +140,7 @@ async function editTask(id, text) {
   if (!task || task.text === text) return;
   task.text = text;
   await saveTasks();
-  render();
+  renderTasks();
 }
 
 /* --- Proyectos --- */
@@ -149,6 +150,16 @@ async function addProject(name) {
   projects.push(project);
   await saveProjects();
   selectedProjectId = project.id;
+  render();
+}
+
+async function updateProject(id, name, icon) {
+  const project = projects.find((item) => item.id === id);
+  if (!project) return;
+  project.name = name;
+  project.icon = icon;
+  await saveProjects();
+  editingProjectId = null;
   render();
 }
 
@@ -167,6 +178,7 @@ async function deleteProject(id) {
   if (tasksChanged) await saveTasks();
 
   if (selectedProjectId === id) selectedProjectId = ALL_ID;
+  if (editingProjectId === id) editingProjectId = null;
   render();
 }
 
@@ -179,20 +191,90 @@ function selectProject(id) {
 /** true mientras se muestra el campo para escribir el nombre del nuevo proyecto */
 let isAddingProject = false;
 
+/** Id del proyecto cuyo popover de edición (nombre + imagen) está abierto, o null */
+let editingProjectId = null;
+
+/**
+ * El único popover flotante activo (campo "nuevo proyecto" o editor), o null.
+ * Vive en <body>, no dentro de .rail: el riel necesita scroll vertical, y con overflow-y
+ * distinto de "visible" los navegadores fuerzan también el recorte horizontal, así que
+ * cualquier popover posicionado "fuera" del riel quedaría cortado si colgara de él.
+ */
+let activePopover = null;
+
+function closeActivePopover() {
+  if (!activePopover) return;
+  document.removeEventListener("mousedown", activePopover.onOutsideClick, true);
+  activePopover.el.remove();
+  activePopover = null;
+}
+
+/** Añade `el` a <body>, lo sitúa junto a `anchorEl` y lo cierra al hacer click fuera de ambos */
+function openPopover(el, anchorEl, onOutsideClose) {
+  closeActivePopover();
+
+  document.body.append(el);
+  const rect = anchorEl.getBoundingClientRect();
+  el.style.left = `${rect.right + 10}px`;
+  el.style.top = `${rect.top + rect.height / 2}px`;
+
+  const onOutsideClick = (event) => {
+    if (el.contains(event.target) || anchorEl.contains(event.target)) return;
+    onOutsideClose();
+  };
+  document.addEventListener("mousedown", onOutsideClick, true);
+  activePopover = { el, onOutsideClick };
+}
+
+function openProjectEditor(id) {
+  isAddingProject = false;
+  editingProjectId = id;
+  renderProjects();
+}
+
+function closeProjectEditor() {
+  editingProjectId = null;
+  renderProjects();
+}
+
 function renderProjects() {
   projectsNav.replaceChildren();
+  closeActivePopover();
 
-  projectsNav.append(buildRailIcon(ALL_ID, msg("allProjects", "Todas"), false, true));
+  projectsNav.append(buildAllRailIcon());
 
   if (projects.length > 0) {
     projectsNav.append(buildDivider());
     for (const project of projects) {
-      projectsNav.append(buildRailIcon(project.id, project.name, true, false));
+      projectsNav.append(buildProjectRailIcon(project));
     }
     projectsNav.append(buildDivider());
   }
 
-  projectsNav.append(buildAddIcon());
+  const addWrap = buildAddIcon();
+  projectsNav.append(addWrap);
+
+  if (isAddingProject) {
+    const field = buildProjectInputField();
+    openPopover(field, addWrap.querySelector(".rail-icon-add"), () => {
+      isAddingProject = false;
+      renderProjects();
+    });
+    field.focus();
+  } else if (editingProjectId) {
+    const project = projects.find((p) => p.id === editingProjectId);
+    const projectIcon = projectsNav.querySelector(`.rail-icon[data-id="${editingProjectId}"]`);
+    if (project && projectIcon) {
+      const popover = buildProjectEditPopover(project);
+      openPopover(popover, projectIcon.querySelector(".rail-icon__select"), closeProjectEditor);
+      const nameInput = popover.querySelector(".project-edit__name");
+      nameInput.focus();
+      nameInput.select();
+    } else {
+      // El proyecto se borró (p.ej. desde otra ventana) mientras se editaba
+      editingProjectId = null;
+    }
+  }
 }
 
 /** Iniciales para el icono de un proyecto: dos palabras -> sus iniciales, una palabra -> sus dos primeras letras */
@@ -214,26 +296,56 @@ function buildAllIconGlyph() {
   return svg;
 }
 
-function buildRailIcon(id, label, deletable, isAllIcon) {
-  const icon = railIconTemplate.content.firstElementChild.cloneNode(true);
-  icon.dataset.id = id;
-  icon.classList.toggle("rail-icon--active", selectedProjectId === id);
-
-  const labelEl = icon.querySelector(".rail-icon__label");
-  if (isAllIcon) {
-    labelEl.append(buildAllIconGlyph());
+/** Pinta la foto del proyecto si tiene, o sus iniciales si no */
+function renderProjectAvatar(container, project) {
+  container.replaceChildren();
+  if (project.icon) {
+    const img = document.createElement("img");
+    img.src = project.icon;
+    img.alt = "";
+    container.append(img);
   } else {
-    labelEl.textContent = projectInitials(label);
+    container.textContent = projectInitials(project.name);
   }
+}
 
+function buildAllRailIcon() {
+  const icon = railIconTemplate.content.firstElementChild.cloneNode(true);
+  icon.dataset.id = ALL_ID;
+  icon.classList.toggle("rail-icon--active", selectedProjectId === ALL_ID);
+  icon.querySelector(".rail-icon__label").append(buildAllIconGlyph());
+
+  const label = msg("allProjects", "Todas");
   const selectBtn = icon.querySelector(".rail-icon__select");
   selectBtn.title = label;
   selectBtn.setAttribute("aria-label", label);
 
+  icon.querySelector(".rail-icon__edit").remove();
+  icon.querySelector(".rail-icon__delete").remove();
+
+  applyI18n(icon);
+  return icon;
+}
+
+function buildProjectRailIcon(project) {
+  const icon = railIconTemplate.content.firstElementChild.cloneNode(true);
+  icon.dataset.id = project.id;
+  const isActive = selectedProjectId === project.id;
+  icon.classList.toggle("rail-icon--active", isActive);
+
+  renderProjectAvatar(icon.querySelector(".rail-icon__label"), project);
+
+  const selectBtn = icon.querySelector(".rail-icon__select");
+  selectBtn.title = project.name;
+  selectBtn.setAttribute("aria-label", project.name);
+
+  const editBtn = icon.querySelector(".rail-icon__edit");
   const deleteBtn = icon.querySelector(".rail-icon__delete");
-  if (deletable && selectedProjectId === id) {
+  if (isActive) {
+    editBtn.hidden = false;
     deleteBtn.hidden = false;
   } else {
+    editBtn.remove();
     deleteBtn.remove();
   }
 
@@ -261,16 +373,131 @@ function buildAddIcon() {
   button.textContent = "+";
   wrap.append(button);
 
-  if (isAddingProject) {
-    const field = document.createElement("input");
-    field.type = "text";
-    field.className = "rail-project-input";
-    field.placeholder = msg("newProjectPlaceholder", "Nombre del proyecto");
-    field.maxLength = 40;
-    wrap.append(field);
+  return wrap;
+}
+
+/** Campo flotante para escribir el nombre del proyecto nuevo: Enter confirma, Escape cancela */
+function buildProjectInputField() {
+  const field = document.createElement("input");
+  field.type = "text";
+  field.className = "rail-project-input";
+  field.placeholder = msg("newProjectPlaceholder", "Nombre del proyecto");
+  field.maxLength = 40;
+
+  field.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const name = field.value.trim().slice(0, 40);
+      isAddingProject = false;
+      if (name) addProject(name);
+      else renderProjects();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      isAddingProject = false;
+      renderProjects();
+    }
+  });
+
+  return field;
+}
+
+/**
+ * Recorta la imagen a un cuadrado centrado y la reduce a `size`x`size`,
+ * para no llenar chrome.storage.local de fotos a resolución completa.
+ */
+function resizeImageToDataUrl(file, size) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error ?? new Error("No se pudo leer el archivo"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("El archivo no es una imagen válida"));
+      img.onload = () => {
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width - side) / 2;
+        const sy = (img.height - side) / 2;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        canvas.getContext("2d").drawImage(img, sx, sy, side, side, 0, 0, size, size);
+
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Popover con el avatar y el nombre de un proyecto, para renombrarlo o cambiarle la imagen */
+function buildProjectEditPopover(project) {
+  const popover = projectEditTemplate.content.firstElementChild.cloneNode(true);
+
+  const avatarBtn = popover.querySelector(".project-edit__avatar");
+  const avatarContent = popover.querySelector(".project-edit__avatar-content");
+  const fileInput = popover.querySelector(".project-edit__file");
+  const nameInput = popover.querySelector(".project-edit__name");
+  const removeIconBtn = popover.querySelector(".project-edit__remove-icon");
+  const cancelBtn = popover.querySelector(".project-edit__cancel");
+  const saveBtn = popover.querySelector(".project-edit__save");
+
+  nameInput.value = project.name;
+
+  // Cambios en memoria: no tocan `projects` hasta pulsar "Guardar"
+  let pendingIcon = project.icon ?? null;
+
+  function refreshAvatar() {
+    renderProjectAvatar(avatarContent, { name: nameInput.value || project.name, icon: pendingIcon });
+    removeIconBtn.hidden = !pendingIcon;
+  }
+  refreshAvatar();
+
+  avatarBtn.addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files?.[0];
+    fileInput.value = "";
+    if (!file) return;
+    try {
+      pendingIcon = await resizeImageToDataUrl(file, 128);
+      refreshAvatar();
+    } catch (error) {
+      console.warn("No se pudo procesar la imagen del proyecto:", error);
+    }
+  });
+
+  removeIconBtn.addEventListener("click", () => {
+    pendingIcon = null;
+    refreshAvatar();
+  });
+
+  nameInput.addEventListener("input", refreshAvatar);
+
+  nameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      save();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      closeProjectEditor();
+    }
+  });
+
+  function save() {
+    const name = nameInput.value.trim().slice(0, 40);
+    if (!name) {
+      nameInput.focus();
+      return;
+    }
+    updateProject(project.id, name, pendingIcon);
   }
 
-  return wrap;
+  cancelBtn.addEventListener("click", closeProjectEditor);
+  saveBtn.addEventListener("click", save);
+
+  applyI18n(popover);
+  return popover;
 }
 
 /* --- Edición en línea --- */
@@ -333,9 +560,14 @@ function visibleTasks() {
     : tasks.filter((task) => task.projectId === selectedProjectId);
 }
 
+/** Reconstruye el riel y la lista de tareas; úsalo sólo cuando cambian los proyectos */
 function render() {
   renderProjects();
+  renderTasks();
+}
 
+/** Reconstruye sólo la lista de tareas, sin tocar el riel de proyectos */
+function renderTasks() {
   list.replaceChildren();
   const filtered = visibleTasks();
 
@@ -424,8 +656,14 @@ list.addEventListener("change", (event) => {
 projectsNav.addEventListener("click", (event) => {
   if (event.target.closest(".rail-icon-add")) {
     isAddingProject = true;
-    render();
-    projectsNav.querySelector(".rail-project-input")?.focus();
+    editingProjectId = null;
+    renderProjects();
+    return;
+  }
+
+  const editBtn = event.target.closest(".rail-icon__edit");
+  if (editBtn) {
+    openProjectEditor(editBtn.closest(".rail-icon").dataset.id);
     return;
   }
 
@@ -437,33 +675,6 @@ projectsNav.addEventListener("click", (event) => {
 
   const select = event.target.closest(".rail-icon__select");
   if (select) selectProject(select.closest(".rail-icon").dataset.id);
-});
-
-function commitNewProject(event) {
-  const name = event.target.value.trim().slice(0, 40);
-  isAddingProject = false;
-  if (name) {
-    addProject(name);
-  } else {
-    render();
-  }
-}
-
-projectsNav.addEventListener("keydown", (event) => {
-  if (!event.target.classList.contains("rail-project-input")) return;
-  if (event.key === "Enter") {
-    event.preventDefault();
-    commitNewProject(event);
-  } else if (event.key === "Escape") {
-    event.preventDefault();
-    isAddingProject = false;
-    render();
-  }
-});
-
-projectsNav.addEventListener("focusout", (event) => {
-  if (!isAddingProject || !event.target.classList.contains("rail-project-input")) return;
-  commitNewProject(event);
 });
 
 themeButton.addEventListener("click", toggleTheme);
@@ -480,7 +691,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (changes[STORAGE_KEY]) {
     const value = changes[STORAGE_KEY].newValue;
     tasks = Array.isArray(value) ? value : [];
-    render();
+    renderTasks();
   }
 
   if (changes[PROJECTS_KEY]) {

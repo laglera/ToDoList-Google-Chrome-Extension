@@ -101,6 +101,21 @@
         </button>
         <button
           type="button"
+          class="rail-icon__edit"
+          aria-label="Editar proyecto"
+          title="Editar proyecto"
+          data-i18n-aria-label="editProject"
+          data-i18n-title="editProject"
+          hidden
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path
+              d="M11.3 2.3a1.5 1.5 0 0 1 2.1 0l.3.3a1.5 1.5 0 0 1 0 2.1L5.4 13 2 14l1-3.4z"
+            />
+          </svg>
+        </button>
+        <button
+          type="button"
           class="rail-icon__delete"
           aria-label="Eliminar proyecto"
           title="Eliminar proyecto"
@@ -113,6 +128,52 @@
           </svg>
         </button>
       </span>
+    </template>
+
+    <template id="project-edit-template">
+      <div class="project-edit">
+        <button
+          type="button"
+          class="project-edit__avatar"
+          aria-label="Cambiar imagen"
+          title="Cambiar imagen"
+          data-i18n-aria-label="changeImage"
+          data-i18n-title="changeImage"
+        >
+          <span class="project-edit__avatar-content"></span>
+          <span class="project-edit__avatar-overlay" aria-hidden="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M4 8h3l1.6-2.2a1 1 0 0 1 .8-.4h5.2a1 1 0 0 1 .8.4L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"
+              />
+              <circle cx="12" cy="13.5" r="3.3" />
+            </svg>
+          </span>
+        </button>
+        <input type="file" class="project-edit__file" accept="image/*" hidden />
+
+        <input
+          type="text"
+          class="project-edit__name"
+          maxlength="40"
+          aria-label="Nombre del proyecto"
+          data-i18n-aria-label="newProjectPlaceholder"
+        />
+
+        <button
+          type="button"
+          class="project-edit__remove-icon"
+          data-i18n="removeImage"
+          hidden
+        >
+          Quitar imagen
+        </button>
+
+        <div class="project-edit__actions">
+          <button type="button" class="project-edit__cancel" data-i18n="cancel">Cancelar</button>
+          <button type="button" class="project-edit__save" data-i18n="save">Guardar</button>
+        </div>
+      </div>
     </template>
 
     <script src="sidepanel.js"></script>

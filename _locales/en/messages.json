@@ -76,5 +76,20 @@
   },
   "deleteProject": {
     "message": "Delete project"
+  },
+  "editProject": {
+    "message": "Edit project"
+  },
+  "changeImage": {
+    "message": "Change image"
+  },
+  "removeImage": {
+    "message": "Remove image"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "save": {
+    "message": "Save"
   }
 }
