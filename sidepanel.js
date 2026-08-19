@@ -145,11 +145,12 @@ async function editTask(id, text) {
 
 /* --- Proyectos --- */
 
-async function addProject(name) {
-  const project = { id: crypto.randomUUID(), name };
+async function addProject(name, icon) {
+  const project = { id: crypto.randomUUID(), name, icon: icon ?? null };
   projects.push(project);
   await saveProjects();
   selectedProjectId = project.id;
+  isAddingProject = false;
   render();
 }
 
@@ -255,26 +256,38 @@ function renderProjects() {
   projectsNav.append(addWrap);
 
   if (isAddingProject) {
-    const field = buildProjectInputField();
-    openPopover(field, addWrap.querySelector(".rail-icon-add"), () => {
-      isAddingProject = false;
-      renderProjects();
-    });
-    field.focus();
+    const popover = buildProjectFormPopover(
+      { name: "", icon: null },
+      { onSave: (name, icon) => addProject(name, icon), onCancel: cancelAddingProject }
+    );
+    openPopover(popover, addWrap.querySelector(".rail-icon-add"), cancelAddingProject);
+    focusPopoverName(popover);
   } else if (editingProjectId) {
     const project = projects.find((p) => p.id === editingProjectId);
     const projectIcon = projectsNav.querySelector(`.rail-icon[data-id="${editingProjectId}"]`);
     if (project && projectIcon) {
-      const popover = buildProjectEditPopover(project);
+      const popover = buildProjectFormPopover(
+        { name: project.name, icon: project.icon },
+        { onSave: (name, icon) => updateProject(project.id, name, icon), onCancel: closeProjectEditor }
+      );
       openPopover(popover, projectIcon.querySelector(".rail-icon__select"), closeProjectEditor);
-      const nameInput = popover.querySelector(".project-edit__name");
-      nameInput.focus();
-      nameInput.select();
+      focusPopoverName(popover);
     } else {
       // El proyecto se borró (p.ej. desde otra ventana) mientras se editaba
       editingProjectId = null;
     }
   }
+}
+
+function cancelAddingProject() {
+  isAddingProject = false;
+  renderProjects();
+}
+
+function focusPopoverName(popover) {
+  const nameInput = popover.querySelector(".project-edit__name");
+  nameInput.focus();
+  nameInput.select();
 }
 
 /** Iniciales para el icono de un proyecto: dos palabras -> sus iniciales, una palabra -> sus dos primeras letras */
@@ -376,31 +389,6 @@ function buildAddIcon() {
   return wrap;
 }
 
-/** Campo flotante para escribir el nombre del proyecto nuevo: Enter confirma, Escape cancela */
-function buildProjectInputField() {
-  const field = document.createElement("input");
-  field.type = "text";
-  field.className = "rail-project-input";
-  field.placeholder = msg("newProjectPlaceholder", "Nombre del proyecto");
-  field.maxLength = 40;
-
-  field.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      const name = field.value.trim().slice(0, 40);
-      isAddingProject = false;
-      if (name) addProject(name);
-      else renderProjects();
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      isAddingProject = false;
-      renderProjects();
-    }
-  });
-
-  return field;
-}
-
 /**
  * Recorta la imagen a un cuadrado centrado y la reduce a `size`x`size`,
  * para no llenar chrome.storage.local de fotos a resolución completa.
@@ -430,8 +418,12 @@ function resizeImageToDataUrl(file, size) {
   });
 }
 
-/** Popover con el avatar y el nombre de un proyecto, para renombrarlo o cambiarle la imagen */
-function buildProjectEditPopover(project) {
+/**
+ * Popover con avatar + nombre, usado tanto para crear un proyecto como para renombrarlo
+ * o cambiarle la imagen. `initial` son los valores de partida; `onSave`/`onCancel` deciden
+ * qué hacer con el resultado (crear un proyecto nuevo o actualizar uno existente).
+ */
+function buildProjectFormPopover(initial, { onSave, onCancel }) {
   const popover = projectEditTemplate.content.firstElementChild.cloneNode(true);
 
   const avatarBtn = popover.querySelector(".project-edit__avatar");
@@ -442,13 +434,13 @@ function buildProjectEditPopover(project) {
   const cancelBtn = popover.querySelector(".project-edit__cancel");
   const saveBtn = popover.querySelector(".project-edit__save");
 
-  nameInput.value = project.name;
+  nameInput.value = initial.name;
 
-  // Cambios en memoria: no tocan `projects` hasta pulsar "Guardar"
-  let pendingIcon = project.icon ?? null;
+  // Cambios en memoria: no se guardan hasta pulsar "Guardar"
+  let pendingIcon = initial.icon ?? null;
 
   function refreshAvatar() {
-    renderProjectAvatar(avatarContent, { name: nameInput.value || project.name, icon: pendingIcon });
+    renderProjectAvatar(avatarContent, { name: nameInput.value, icon: pendingIcon });
     removeIconBtn.hidden = !pendingIcon;
   }
   refreshAvatar();
@@ -480,7 +472,7 @@ function buildProjectEditPopover(project) {
       save();
     } else if (event.key === "Escape") {
       event.preventDefault();
-      closeProjectEditor();
+      onCancel();
     }
   });
 
@@ -490,10 +482,10 @@ function buildProjectEditPopover(project) {
       nameInput.focus();
       return;
     }
-    updateProject(project.id, name, pendingIcon);
+    onSave(name, pendingIcon);
   }
 
-  cancelBtn.addEventListener("click", closeProjectEditor);
+  cancelBtn.addEventListener("click", onCancel);
   saveBtn.addEventListener("click", save);
 
   applyI18n(popover);

@@ -319,29 +319,11 @@ body {
   outline-offset: 2px;
 }
 
-/* position:fixed y no absolute: el riel necesita scroll vertical, y CSS obliga a que un
-   eje con overflow "auto" recorte también el otro si no está fijado fuera de ese contexto */
-.rail-project-input {
-  position: fixed;
-  z-index: 50;
-  width: 160px;
-  height: 36px;
-  padding: 0 12px;
-  border: 1.5px solid var(--accent);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text);
-  font: inherit;
-  font-size: 13px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-  transform: translateY(-50%);
-}
-
-.rail-project-input:focus {
-  outline: none;
-}
-
-/* Popover de edición de proyecto: nombre + imagen del icono */
+/*
+ * Popover de proyecto (crear o editar): avatar + nombre.
+ * position:fixed y no absolute: el riel necesita scroll vertical, y CSS obliga a que un
+ * eje con overflow "auto" recorte también el otro si no está fijado fuera de ese contexto.
+ */
 .project-edit {
   position: fixed;
   z-index: 50;
