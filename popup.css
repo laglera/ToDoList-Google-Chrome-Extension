@@ -285,7 +285,8 @@ body {
   text-decoration-thickness: 1.5px;
 }
 
-/* Botón de borrar: oculto hasta apuntar la tarea o llegar por teclado */
+/* Botones de editar/borrar: ocultos hasta apuntar la tarea o llegar por teclado */
+.task__edit,
 .task__delete {
   flex-shrink: 0;
   display: grid;
@@ -302,21 +303,29 @@ body {
   transition: opacity 0.15s ease, color 0.15s ease;
 }
 
+.task:hover .task__edit,
+.task:focus-within .task__edit,
 .task:hover .task__delete,
 .task:focus-within .task__delete {
   opacity: 1;
+}
+
+.task__edit:hover {
+  color: var(--accent);
 }
 
 .task__delete:hover {
   color: var(--danger);
 }
 
+.task__edit:focus-visible,
 .task__delete:focus-visible {
   opacity: 1;
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
+.task__edit svg,
 .task__delete svg {
   width: 12px;
   height: 12px;
@@ -324,6 +333,19 @@ body {
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
+}
+
+/* Tarea en modo edición: siempre visible y con el texto editable resaltado */
+.task--editing .task__edit,
+.task--editing .task__delete {
+  opacity: 1;
+}
+
+.task--editing .task__text {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px var(--accent);
+  cursor: text;
 }
 
 /* Estado vacío */

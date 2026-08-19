@@ -28,19 +28,30 @@
   "pendingOne": {
     "message": "$COUNT$ of $TOTAL$ left",
     "placeholders": {
-      "count": { "content": "$1" },
-      "total": { "content": "$2" }
+      "count": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
     }
   },
   "pendingMany": {
     "message": "$COUNT$ of $TOTAL$ left",
     "placeholders": {
-      "count": { "content": "$1" },
-      "total": { "content": "$2" }
+      "count": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
     }
   },
   "emptyState": {
     "message": "Nothing pending."
+  },
+  "editTask": {
+    "message": "Edit task"
   },
   "deleteTask": {
     "message": "Delete task"

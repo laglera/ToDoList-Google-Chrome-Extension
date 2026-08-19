@@ -28,19 +28,30 @@
   "pendingOne": {
     "message": "$COUNT$ di $TOTAL$ da fare",
     "placeholders": {
-      "count": { "content": "$1" },
-      "total": { "content": "$2" }
+      "count": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
     }
   },
   "pendingMany": {
     "message": "$COUNT$ di $TOTAL$ da fare",
     "placeholders": {
-      "count": { "content": "$1" },
-      "total": { "content": "$2" }
+      "count": {
+        "content": "$1"
+      },
+      "total": {
+        "content": "$2"
+      }
     }
   },
   "emptyState": {
     "message": "Niente in sospeso."
+  },
+  "editTask": {
+    "message": "Modifica attività"
   },
   "deleteTask": {
     "message": "Elimina attività"

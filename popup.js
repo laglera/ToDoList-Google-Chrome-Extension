@@ -111,6 +111,66 @@ async function deleteTask(id) {
   render();
 }
 
+async function editTask(id, text) {
+  const task = tasks.find((item) => item.id === id);
+  if (!task || task.text === text) return;
+  task.text = text;
+  await saveTasks();
+  render();
+}
+
+/* --- Edición en línea --- */
+
+/** Convierte el texto de la tarea en un campo editable y lo enfoca */
+function startEditing(item) {
+  const textEl = item.querySelector(".task__text");
+  const original = textEl.textContent;
+
+  textEl.contentEditable = "plaintext-only";
+  item.classList.add("task--editing");
+  textEl.focus();
+
+  const range = document.createRange();
+  range.selectNodeContents(textEl);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+
+  let finished = false;
+  const finish = (save) => {
+    if (finished) return;
+    finished = true;
+    textEl.removeEventListener("keydown", onKeydown);
+    textEl.removeEventListener("blur", onBlur);
+    textEl.contentEditable = "false";
+    item.classList.remove("task--editing");
+
+    const value = textEl.textContent.trim().slice(0, 200);
+    if (save && value) {
+      editTask(item.dataset.id, value);
+    } else {
+      textEl.textContent = original;
+    }
+  };
+
+  function onKeydown(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finish(true);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      finish(false);
+    }
+  }
+
+  function onBlur() {
+    finish(true);
+  }
+
+  textEl.addEventListener("keydown", onKeydown);
+  textEl.addEventListener("blur", onBlur);
+}
+
 /* --- Renderizado --- */
 
 function render() {
@@ -171,8 +231,16 @@ list.addEventListener("click", (event) => {
   const item = event.target.closest(".task");
   if (!item) return;
 
+  // Mientras se edita, un clic para mover el cursor no debe marcar/desmarcar la tarea
+  if (item.classList.contains("task--editing") && event.target.closest(".task__label")) {
+    event.preventDefault();
+    return;
+  }
+
   if (event.target.closest(".task__delete")) {
     deleteTask(item.dataset.id);
+  } else if (event.target.closest(".task__edit")) {
+    startEditing(item);
   }
 });
 
