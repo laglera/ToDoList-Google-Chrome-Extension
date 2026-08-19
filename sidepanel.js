@@ -143,6 +143,14 @@ async function editTask(id, text) {
   renderTasks();
 }
 
+async function moveTaskToProject(id, projectId) {
+  const task = tasks.find((item) => item.id === id);
+  if (!task || task.projectId === projectId) return;
+  task.projectId = projectId;
+  await saveTasks();
+  renderTasks();
+}
+
 /* --- Proyectos --- */
 
 async function addProject(name, icon) {
@@ -196,10 +204,10 @@ let isAddingProject = false;
 let editingProjectId = null;
 
 /**
- * El único popover flotante activo (campo "nuevo proyecto" o editor), o null.
+ * El único popover flotante activo (campo "nuevo proyecto" o editor de proyecto), o null.
  * Vive en <body>, no dentro de .rail: el riel necesita scroll vertical, y con overflow-y
  * distinto de "visible" los navegadores fuerzan también el recorte horizontal, así que
- * cualquier popover posicionado "fuera" del riel quedaría cortado si colgara de él.
+ * un popover posicionado "fuera" del riel quedaría cortado si colgara de él.
  */
 let activePopover = null;
 
@@ -501,6 +509,7 @@ function startEditing(item) {
 
   textEl.contentEditable = "plaintext-only";
   item.classList.add("task--editing");
+  item.draggable = false; // si no, arrastrar el cursor para seleccionar texto mueve la tarea
   textEl.focus();
 
   const range = document.createRange();
@@ -517,6 +526,7 @@ function startEditing(item) {
     textEl.removeEventListener("blur", onBlur);
     textEl.contentEditable = "false";
     item.classList.remove("task--editing");
+    item.draggable = true;
 
     const value = textEl.textContent.trim().slice(0, 200);
     if (save && value) {
@@ -566,6 +576,7 @@ function renderTasks() {
   for (const task of filtered) {
     const item = template.content.firstElementChild.cloneNode(true);
     item.dataset.id = task.id;
+    item.draggable = true;
     item.classList.toggle("task--completed", task.completed);
 
     const checkbox = item.querySelector(".task__checkbox");
@@ -578,7 +589,10 @@ function renderTasks() {
     const projectBadge = item.querySelector(".task__project");
     const project = task.projectId && projects.find((p) => p.id === task.projectId);
     if (selectedProjectId === ALL_ID && project) {
-      projectBadge.textContent = project.name;
+      // Recortado aquí, en JS, y no sólo por CSS: así nunca puede robarle el ancho al texto
+      // de la tarea, sea cual sea el navegador o si los estilos tardan en actualizarse.
+      projectBadge.textContent =
+        project.name.length > 18 ? `${project.name.slice(0, 18)}…` : project.name;
       projectBadge.hidden = false;
     }
 
@@ -643,6 +657,47 @@ list.addEventListener("change", (event) => {
   if (!event.target.classList.contains("task__checkbox")) return;
   const item = event.target.closest(".task");
   if (item) toggleTask(item.dataset.id);
+});
+
+// Arrastrar una tarea hasta el icono de un proyecto en el riel la mueve a ese proyecto
+list.addEventListener("dragstart", (event) => {
+  const item = event.target.closest(".task");
+  if (!item) return;
+  event.dataTransfer.setData("text/plain", item.dataset.id);
+  event.dataTransfer.effectAllowed = "move";
+  item.classList.add("task--dragging");
+});
+
+list.addEventListener("dragend", (event) => {
+  event.target.closest(".task")?.classList.remove("task--dragging");
+});
+
+projectsNav.addEventListener("dragover", (event) => {
+  if (!event.target.closest(".rail-icon")) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+});
+
+projectsNav.addEventListener("dragenter", (event) => {
+  event.target.closest(".rail-icon")?.classList.add("rail-icon--drop-target");
+});
+
+projectsNav.addEventListener("dragleave", (event) => {
+  const icon = event.target.closest(".rail-icon");
+  if (icon && !icon.contains(event.relatedTarget)) {
+    icon.classList.remove("rail-icon--drop-target");
+  }
+});
+
+projectsNav.addEventListener("drop", (event) => {
+  const icon = event.target.closest(".rail-icon");
+  if (!icon) return;
+  event.preventDefault();
+  icon.classList.remove("rail-icon--drop-target");
+
+  const taskId = event.dataTransfer.getData("text/plain");
+  if (!taskId) return;
+  moveTaskToProject(taskId, icon.dataset.id === ALL_ID ? null : icon.dataset.id);
 });
 
 projectsNav.addEventListener("click", (event) => {

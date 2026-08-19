@@ -565,6 +565,7 @@ body {
   padding: 14px 18px;
   border-radius: 14px;
   background: var(--pill);
+  cursor: grab;
   transition: background-color 0.15s ease;
 }
 
@@ -572,10 +573,16 @@ body {
   background: var(--pill-hover);
 }
 
+/*
+ * Grid, no flex: con checkbox + texto + insignia de proyecto anidados, el cálculo de
+ * min-width:auto en flexbox es frágil y puede colapsar el texto a un carácter por línea
+ * si la insignia es larga. minmax(0, 1fr) en grid sí garantiza el límite sin depender de eso.
+ */
 .task__label {
   flex: 1;
   min-width: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   cursor: pointer;
@@ -623,6 +630,7 @@ body {
 }
 
 .task__text {
+  min-width: 0;
   overflow-wrap: anywhere;
   line-height: 1.3;
   transition: color 0.15s ease;
@@ -637,13 +645,15 @@ body {
 /* Etiqueta de proyecto: sólo visible mientras se ven las tareas de todos los proyectos */
 .task__project {
   flex-shrink: 0;
-  margin-left: auto;
+  max-width: 110px;
+  overflow: hidden;
   padding: 3px 9px;
   border-radius: 999px;
   background: var(--hover-layer);
   color: var(--text-muted);
   font-size: 11px;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Botones de editar/borrar: ocultos hasta apuntar la tarea o llegar por teclado */
@@ -702,6 +712,11 @@ body {
   opacity: 1;
 }
 
+/* Arrastrar una tarea: se atenúa mientras se arrastra sobre el riel */
+.task--dragging {
+  opacity: 0.4;
+}
+
 .task--editing .task__text {
   outline: none;
   border-radius: 4px;
@@ -715,4 +730,11 @@ body {
   color: var(--text-muted);
   font-size: 13px;
   text-align: center;
+}
+
+/* Icono de proyecto como zona de destino al arrastrar una tarea sobre él */
+.rail-icon--drop-target .rail-icon__select {
+  border-radius: 16px;
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
 }
