@@ -15,7 +15,7 @@ const emptyState = document.getElementById("empty-state");
 const template = document.getElementById("task-template");
 const themeButton = document.getElementById("theme-button");
 const projectsNav = document.getElementById("projects");
-const projectChipTemplate = document.getElementById("project-chip-template");
+const railIconTemplate = document.getElementById("rail-icon-template");
 
 /** @type {{id: string, text: string, completed: boolean, projectId: string|null}[]} */
 let tasks = [];
@@ -182,54 +182,95 @@ let isAddingProject = false;
 function renderProjects() {
   projectsNav.replaceChildren();
 
-  // El filtro "Todas" sólo tiene sentido si ya existe algún proyecto entre el que elegir
+  projectsNav.append(buildRailIcon(ALL_ID, msg("allProjects", "Todas"), false, true));
+
   if (projects.length > 0) {
-    projectsNav.append(buildProjectChip(ALL_ID, msg("allProjects", "Todas"), false));
+    projectsNav.append(buildDivider());
+    for (const project of projects) {
+      projectsNav.append(buildRailIcon(project.id, project.name, true, false));
+    }
+    projectsNav.append(buildDivider());
   }
 
-  for (const project of projects) {
-    projectsNav.append(buildProjectChip(project.id, project.name, true));
-  }
-
-  // El botón "+" siempre está disponible, incluso sin proyectos, para poder crear el primero
-  projectsNav.append(isAddingProject ? buildProjectInput() : buildAddProjectChip());
+  projectsNav.append(buildAddIcon());
 }
 
-function buildProjectChip(id, label, deletable) {
-  const chip = projectChipTemplate.content.firstElementChild.cloneNode(true);
-  chip.dataset.id = id;
-  chip.classList.toggle("project-chip--active", selectedProjectId === id);
-  chip.querySelector(".project-chip__label").textContent = label;
+/** Iniciales para el icono de un proyecto: dos palabras -> sus iniciales, una palabra -> sus dos primeras letras */
+function projectInitials(name) {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return name.trim().slice(0, 2).toUpperCase();
+}
 
-  const deleteBtn = chip.querySelector(".project-chip__delete");
+function buildAllIconGlyph() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  svg.classList.add("rail-icon__all-svg");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", "M4 6h16M4 12h16M4 18h16");
+  svg.append(path);
+  return svg;
+}
+
+function buildRailIcon(id, label, deletable, isAllIcon) {
+  const icon = railIconTemplate.content.firstElementChild.cloneNode(true);
+  icon.dataset.id = id;
+  icon.classList.toggle("rail-icon--active", selectedProjectId === id);
+
+  const labelEl = icon.querySelector(".rail-icon__label");
+  if (isAllIcon) {
+    labelEl.append(buildAllIconGlyph());
+  } else {
+    labelEl.textContent = projectInitials(label);
+  }
+
+  const selectBtn = icon.querySelector(".rail-icon__select");
+  selectBtn.title = label;
+  selectBtn.setAttribute("aria-label", label);
+
+  const deleteBtn = icon.querySelector(".rail-icon__delete");
   if (deletable && selectedProjectId === id) {
     deleteBtn.hidden = false;
   } else {
     deleteBtn.remove();
   }
 
-  applyI18n(chip);
-  return chip;
+  applyI18n(icon);
+  return icon;
 }
 
-function buildAddProjectChip() {
+function buildDivider() {
+  const divider = document.createElement("span");
+  divider.className = "rail__divider";
+  divider.setAttribute("aria-hidden", "true");
+  return divider;
+}
+
+function buildAddIcon() {
+  const wrap = document.createElement("span");
+  wrap.className = "rail-add";
+
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "project-chip project-chip--add";
+  button.className = "rail-icon-add";
   const label = msg("addProject", "Añadir proyecto");
   button.title = label;
   button.setAttribute("aria-label", label);
   button.textContent = "+";
-  return button;
-}
+  wrap.append(button);
 
-function buildProjectInput() {
-  const field = document.createElement("input");
-  field.type = "text";
-  field.className = "project-input";
-  field.placeholder = msg("newProjectPlaceholder", "Nombre del proyecto");
-  field.maxLength = 40;
-  return field;
+  if (isAddingProject) {
+    const field = document.createElement("input");
+    field.type = "text";
+    field.className = "rail-project-input";
+    field.placeholder = msg("newProjectPlaceholder", "Nombre del proyecto");
+    field.maxLength = 40;
+    wrap.append(field);
+  }
+
+  return wrap;
 }
 
 /* --- Edición en línea --- */
@@ -381,21 +422,21 @@ list.addEventListener("change", (event) => {
 });
 
 projectsNav.addEventListener("click", (event) => {
-  if (event.target.closest(".project-chip--add")) {
+  if (event.target.closest(".rail-icon-add")) {
     isAddingProject = true;
     render();
-    projectsNav.querySelector(".project-input")?.focus();
+    projectsNav.querySelector(".rail-project-input")?.focus();
     return;
   }
 
-  const deleteBtn = event.target.closest(".project-chip__delete");
+  const deleteBtn = event.target.closest(".rail-icon__delete");
   if (deleteBtn) {
-    deleteProject(deleteBtn.closest(".project-chip").dataset.id);
+    deleteProject(deleteBtn.closest(".rail-icon").dataset.id);
     return;
   }
 
-  const select = event.target.closest(".project-chip__select");
-  if (select) selectProject(select.closest(".project-chip").dataset.id);
+  const select = event.target.closest(".rail-icon__select");
+  if (select) selectProject(select.closest(".rail-icon").dataset.id);
 });
 
 function commitNewProject(event) {
@@ -409,7 +450,7 @@ function commitNewProject(event) {
 }
 
 projectsNav.addEventListener("keydown", (event) => {
-  if (!event.target.classList.contains("project-input")) return;
+  if (!event.target.classList.contains("rail-project-input")) return;
   if (event.key === "Enter") {
     event.preventDefault();
     commitNewProject(event);
@@ -421,7 +462,7 @@ projectsNav.addEventListener("keydown", (event) => {
 });
 
 projectsNav.addEventListener("focusout", (event) => {
-  if (!isAddingProject || !event.target.classList.contains("project-input")) return;
+  if (!isAddingProject || !event.target.classList.contains("rail-project-input")) return;
   commitNewProject(event);
 });
 
