@@ -558,7 +558,7 @@ function startEditing(item) {
 
 function visibleTasks() {
   return selectedProjectId === ALL_ID
-    ? tasks
+    ? tasks.filter((task) => task.projectId == null)
     : tasks.filter((task) => task.projectId === selectedProjectId);
 }
 
@@ -584,17 +584,6 @@ function renderTasks() {
 
     // textContent (nunca innerHTML) para que el texto del usuario no se interprete como HTML
     item.querySelector(".task__text").textContent = task.text;
-
-    // La etiqueta de proyecto sólo aporta información al ver "Todas" a la vez
-    const projectBadge = item.querySelector(".task__project");
-    const project = task.projectId && projects.find((p) => p.id === task.projectId);
-    if (selectedProjectId === ALL_ID && project) {
-      // Recortado aquí, en JS, y no sólo por CSS: así nunca puede robarle el ancho al texto
-      // de la tarea, sea cual sea el navegador o si los estilos tardan en actualizarse.
-      projectBadge.textContent =
-        project.name.length > 18 ? `${project.name.slice(0, 18)}…` : project.name;
-      projectBadge.hidden = false;
-    }
 
     applyI18n(item);
     list.append(item);
