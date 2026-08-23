@@ -4,7 +4,7 @@
     "description": "Nom de l'extension"
   },
   "extDescription": {
-    "message": "Gérez votre liste de tâches directement depuis le navigateur."
+    "message": "Gérez votre liste de tâches et vos favoris directement depuis le navigateur."
   },
   "appTitle": {
     "message": "Mes tâches"
@@ -91,5 +91,110 @@
   },
   "save": {
     "message": "Enregistrer"
+  },
+  "openBookmarks": {
+    "message": "Voir les favoris"
+  },
+  "bookmarksTitle": {
+    "message": "Favoris"
+  },
+  "foldersLabel": {
+    "message": "Dossiers"
+  },
+  "breadcrumbLabel": {
+    "message": "Chemin"
+  },
+  "toggleView": {
+    "message": "Changer d’affichage"
+  },
+  "searchPlaceholder": {
+    "message": "Rechercher dans les favoris…"
+  },
+  "searchResults": {
+    "message": "Résultats de la recherche"
+  },
+  "showMore": {
+    "message": "Afficher plus"
+  },
+  "expandFolder": {
+    "message": "Déplier"
+  },
+  "collapseFolder": {
+    "message": "Replier"
+  },
+  "openInNewTab": {
+    "message": "Ouvrir dans un nouvel onglet"
+  },
+  "copyUrl": {
+    "message": "Copier l’adresse"
+  },
+  "rename": {
+    "message": "Renommer"
+  },
+  "delete": {
+    "message": "Supprimer"
+  },
+  "foldersHeading": {
+    "message": "Dossiers"
+  },
+  "bookmarksHeading": {
+    "message": "Favoris"
+  },
+  "emptyFolder": {
+    "message": "Ce dossier est vide."
+  },
+  "noResults": {
+    "message": "Aucun favori ne correspond."
+  },
+  "resultOne": {
+    "message": "$COUNT$ résultat",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "resultMany": {
+    "message": "$COUNT$ résultats",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemOne": {
+    "message": "$COUNT$ favori",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemMany": {
+    "message": "$COUNT$ favoris",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDeleteFolder": {
+    "message": "Supprimer « $NAME$ » et ses $COUNT$ favoris ?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "confirmDeleteEmptyFolder": {
+    "message": "Supprimer le dossier « $NAME$ » ?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -4,7 +4,7 @@
     "description": "Nombre de la extensión"
   },
   "extDescription": {
-    "message": "Gestiona tu lista de tareas pendientes directamente desde el navegador."
+    "message": "Gestiona tus tareas y tus marcadores directamente desde el navegador."
   },
   "appTitle": {
     "message": "Mis Tareas"
@@ -91,5 +91,110 @@
   },
   "save": {
     "message": "Guardar"
+  },
+  "openBookmarks": {
+    "message": "Ver marcadores"
+  },
+  "bookmarksTitle": {
+    "message": "Marcadores"
+  },
+  "foldersLabel": {
+    "message": "Carpetas"
+  },
+  "breadcrumbLabel": {
+    "message": "Ruta"
+  },
+  "toggleView": {
+    "message": "Cambiar vista"
+  },
+  "searchPlaceholder": {
+    "message": "Buscar marcadores…"
+  },
+  "searchResults": {
+    "message": "Resultados de la búsqueda"
+  },
+  "showMore": {
+    "message": "Mostrar más"
+  },
+  "expandFolder": {
+    "message": "Desplegar"
+  },
+  "collapseFolder": {
+    "message": "Plegar"
+  },
+  "openInNewTab": {
+    "message": "Abrir en una pestaña nueva"
+  },
+  "copyUrl": {
+    "message": "Copiar dirección"
+  },
+  "rename": {
+    "message": "Renombrar"
+  },
+  "delete": {
+    "message": "Eliminar"
+  },
+  "foldersHeading": {
+    "message": "Carpetas"
+  },
+  "bookmarksHeading": {
+    "message": "Marcadores"
+  },
+  "emptyFolder": {
+    "message": "Esta carpeta está vacía."
+  },
+  "noResults": {
+    "message": "Ningún marcador coincide."
+  },
+  "resultOne": {
+    "message": "$COUNT$ resultado",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "resultMany": {
+    "message": "$COUNT$ resultados",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemOne": {
+    "message": "$COUNT$ marcador",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemMany": {
+    "message": "$COUNT$ marcadores",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDeleteFolder": {
+    "message": "¿Eliminar «$NAME$» y sus $COUNT$ marcadores?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "confirmDeleteEmptyFolder": {
+    "message": "¿Eliminar la carpeta «$NAME$»?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

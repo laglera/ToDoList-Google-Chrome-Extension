@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Manage your to-do list right from the browser."
+    "message": "Manage your to-do list and your bookmarks right from the browser."
   },
   "appTitle": {
     "message": "My Tasks"
@@ -91,5 +91,110 @@
   },
   "save": {
     "message": "Save"
+  },
+  "openBookmarks": {
+    "message": "View bookmarks"
+  },
+  "bookmarksTitle": {
+    "message": "Bookmarks"
+  },
+  "foldersLabel": {
+    "message": "Folders"
+  },
+  "breadcrumbLabel": {
+    "message": "Path"
+  },
+  "toggleView": {
+    "message": "Change view"
+  },
+  "searchPlaceholder": {
+    "message": "Search bookmarks…"
+  },
+  "searchResults": {
+    "message": "Search results"
+  },
+  "showMore": {
+    "message": "Show more"
+  },
+  "expandFolder": {
+    "message": "Expand"
+  },
+  "collapseFolder": {
+    "message": "Collapse"
+  },
+  "openInNewTab": {
+    "message": "Open in a new tab"
+  },
+  "copyUrl": {
+    "message": "Copy address"
+  },
+  "rename": {
+    "message": "Rename"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "foldersHeading": {
+    "message": "Folders"
+  },
+  "bookmarksHeading": {
+    "message": "Bookmarks"
+  },
+  "emptyFolder": {
+    "message": "This folder is empty."
+  },
+  "noResults": {
+    "message": "No bookmarks match."
+  },
+  "resultOne": {
+    "message": "$COUNT$ result",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "resultMany": {
+    "message": "$COUNT$ results",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemOne": {
+    "message": "$COUNT$ bookmark",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemMany": {
+    "message": "$COUNT$ bookmarks",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDeleteFolder": {
+    "message": "Delete “$NAME$” and its $COUNT$ bookmarks?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "confirmDeleteEmptyFolder": {
+    "message": "Delete the folder “$NAME$”?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

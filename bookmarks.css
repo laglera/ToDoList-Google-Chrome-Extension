@@ -1,0 +1,572 @@
+/* Ventana emergente de marcadores: árbol de carpetas + cuadrícula */
+
+body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100vh;
+  min-width: 560px;
+  overflow: hidden;
+}
+
+/* --- Panel de carpetas --- */
+
+.folders {
+  flex-shrink: 0;
+  width: 224px;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 10px 14px;
+  background: var(--rail-bg);
+  border-right: 1px solid var(--hover-layer);
+}
+
+.folders__title {
+  padding: 0 8px;
+  margin-bottom: 14px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.folders__tree {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pill) transparent;
+}
+
+/* Cada nivel se sangra con --depth, fijado al construir la fila */
+.tree-node {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: calc(var(--depth, 0) * 13px);
+  border-radius: 8px;
+}
+
+.tree-node--active {
+  background: var(--accent);
+}
+
+.tree-node--drop-target {
+  outline: 2px dashed var(--accent);
+  outline-offset: -2px;
+}
+
+.tree-node__twisty {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 26px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* Se conserva el hueco para que los nombres queden alineados aunque no haya subcarpetas */
+.tree-node__twisty--empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.tree-node__twisty svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s ease;
+}
+
+.tree-node--expanded .tree-node__twisty svg {
+  transform: rotate(90deg);
+}
+
+.tree-node__select {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px 5px 2px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.tree-node:not(.tree-node--active) .tree-node__select:hover {
+  background: var(--hover-layer);
+}
+
+.tree-node--active .tree-node__select,
+.tree-node--active .tree-node__twisty {
+  color: #fff;
+}
+
+.tree-node__select:focus-visible,
+.tree-node__twisty:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.tree-node__icon {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  opacity: 0.75;
+}
+
+.tree-node__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tree-node__count {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.tree-node--active .tree-node__count {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* --- Zona principal --- */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 18px 20px 16px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.topbar__actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 2px;
+}
+
+/* El icono muestra la vista a la que se cambiará */
+.icon--list {
+  display: none;
+}
+
+body[data-view="list"] .icon--list {
+  display: block;
+}
+
+body[data-view="list"] .icon--grid {
+  display: none;
+}
+
+.breadcrumb {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.breadcrumb__crumb {
+  flex-shrink: 0;
+  max-width: 190px;
+  overflow: hidden;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.breadcrumb__crumb:hover {
+  background: var(--hover-layer);
+  color: var(--text);
+}
+
+.breadcrumb__crumb:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* El último tramo es dónde estás, no un destino al que ir */
+.breadcrumb__crumb--current {
+  flex-shrink: 1;
+  color: var(--text);
+  font-weight: 600;
+  cursor: default;
+}
+
+.breadcrumb__crumb--current:hover {
+  background: none;
+}
+
+.breadcrumb__sep {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* --- Buscador --- */
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background: var(--pill);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.search:focus-within {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+
+.search__icon {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke 0.15s ease;
+}
+
+.search:focus-within .search__icon {
+  stroke: var(--accent);
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.search__input::placeholder {
+  color: var(--text-muted);
+}
+
+.search__input:focus {
+  outline: none;
+}
+
+.search__input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.search__count {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Rejilla de marcadores --- */
+
+.items {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  gap: 8px;
+  align-content: start;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pill) transparent;
+}
+
+/*
+ * En lista las tarjetas se aligeran: con decenas de filas seguidas, el fondo sólido
+ * forma un bloque gris continuo. Quedan como un explorador de archivos, y el dominio
+ * se va a la derecha para aprovechar el ancho que la fila ya ocupa.
+ */
+body[data-view="list"] .items {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+body[data-view="list"] .card {
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: none;
+}
+
+body[data-view="list"] .card:hover {
+  background: var(--hover-layer);
+}
+
+body[data-view="list"] .card__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: none;
+}
+
+body[data-view="list"] .card__body {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 14px;
+}
+
+body[data-view="list"] .card__title {
+  flex: 0 1 auto;
+}
+
+body[data-view="list"] .card__sub {
+  flex: 1 1 auto;
+  text-align: right;
+}
+
+/* Encabezado de sección ("Carpetas" / "Marcadores"): ocupa la fila entera */
+.items__heading {
+  grid-column: 1 / -1;
+  padding: 6px 2px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.items__heading:first-child {
+  padding-top: 0;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--pill);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.card:hover {
+  background: var(--pill-hover);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.card--dragging {
+  opacity: 0.45;
+}
+
+.card__icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.card__favicon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Cuando el favicon no carga, queda la inicial que pinta el JS debajo */
+.card__favicon--failed {
+  display: none;
+}
+
+.card__initial {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.card__icon--folder {
+  background: none;
+}
+
+.card__icon--folder svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card__title {
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Al editar el nombre hace falta ver el texto completo y el cursor */
+.card__title[contenteditable="plaintext-only"] {
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  outline: none;
+}
+
+.card__sub {
+  overflow: hidden;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.card__sub mark,
+.card__title mark {
+  padding: 0 1px;
+  border-radius: 3px;
+  background: rgba(43, 124, 246, 0.22);
+  color: inherit;
+}
+
+/* --- Estados --- */
+
+.empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* display:grid gana al comportamiento por defecto de [hidden], hay que anularlo a mano */
+.items[hidden],
+.empty[hidden] {
+  display: none;
+}
+
+.show-more {
+  flex-shrink: 0;
+  align-self: center;
+  margin-top: 10px;
+  padding: 7px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.show-more:hover {
+  background: var(--pill-hover);
+}
+
+.show-more:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- Menú contextual --- */
+
+.menu {
+  position: fixed;
+  z-index: 50;
+  min-width: 190px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hover-layer);
+  border-radius: 11px;
+  background: var(--bg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.menu__item {
+  padding: 7px 11px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.menu__item:hover {
+  background: var(--hover-layer);
+}
+
+.menu__item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.menu__item--danger:hover {
+  color: var(--danger);
+}

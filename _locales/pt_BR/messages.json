@@ -4,7 +4,7 @@
     "description": "Nome da extensão"
   },
   "extDescription": {
-    "message": "Gerencie sua lista de tarefas direto do navegador."
+    "message": "Gerencie sua lista de tarefas e seus favoritos direto do navegador."
   },
   "appTitle": {
     "message": "Minhas tarefas"
@@ -91,5 +91,110 @@
   },
   "save": {
     "message": "Salvar"
+  },
+  "openBookmarks": {
+    "message": "Ver favoritos"
+  },
+  "bookmarksTitle": {
+    "message": "Favoritos"
+  },
+  "foldersLabel": {
+    "message": "Pastas"
+  },
+  "breadcrumbLabel": {
+    "message": "Caminho"
+  },
+  "toggleView": {
+    "message": "Mudar visualização"
+  },
+  "searchPlaceholder": {
+    "message": "Buscar nos favoritos…"
+  },
+  "searchResults": {
+    "message": "Resultados da busca"
+  },
+  "showMore": {
+    "message": "Mostrar mais"
+  },
+  "expandFolder": {
+    "message": "Expandir"
+  },
+  "collapseFolder": {
+    "message": "Recolher"
+  },
+  "openInNewTab": {
+    "message": "Abrir em uma nova aba"
+  },
+  "copyUrl": {
+    "message": "Copiar endereço"
+  },
+  "rename": {
+    "message": "Renomear"
+  },
+  "delete": {
+    "message": "Excluir"
+  },
+  "foldersHeading": {
+    "message": "Pastas"
+  },
+  "bookmarksHeading": {
+    "message": "Favoritos"
+  },
+  "emptyFolder": {
+    "message": "Esta pasta está vazia."
+  },
+  "noResults": {
+    "message": "Nenhum favorito corresponde."
+  },
+  "resultOne": {
+    "message": "$COUNT$ resultado",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "resultMany": {
+    "message": "$COUNT$ resultados",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemOne": {
+    "message": "$COUNT$ favorito",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemMany": {
+    "message": "$COUNT$ favoritos",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDeleteFolder": {
+    "message": "Excluir “$NAME$” e seus $COUNT$ favoritos?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "confirmDeleteEmptyFolder": {
+    "message": "Excluir a pasta “$NAME$”?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

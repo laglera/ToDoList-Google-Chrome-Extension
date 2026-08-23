@@ -1,51 +1,4 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Tema claro (por defecto) */
-:root {
-  --bg: #ffffff;
-  --rail-bg: #f1f1f2;
-  --pill: #dcdcdc;
-  --pill-hover: #d2d2d2;
-  --text: #101010;
-  --text-muted: #8b8b8b;
-  --accent: #2b7cf6;
-  --accent-hover: #1a6ae8;
-  --danger: #d24b4b;
-  --hover-layer: rgba(0, 0, 0, 0.06);
-}
-
-/* Tema oscuro por preferencia del sistema (mientras no se fije uno a mano) */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1c1d20;
-    --rail-bg: #151619;
-    --pill: #2b2d31;
-    --pill-hover: #34363b;
-    --text: #f2f3f5;
-    --text-muted: #8b8f96;
-    --hover-layer: rgba(255, 255, 255, 0.08);
-  }
-}
-
-/* Tema oscuro elegido a mano: gana sobre el del sistema */
-:root[data-theme="dark"] {
-  --bg: #1c1d20;
-  --rail-bg: #151619;
-  --pill: #2b2d31;
-  --pill-hover: #34363b;
-  --text: #f2f3f5;
-  --text-muted: #8b8f96;
-  --hover-layer: rgba(255, 255, 255, 0.08);
-}
-
-html {
-  background: var(--bg);
-  height: 100%;
-}
+/* Panel lateral: riel de proyectos a la izquierda, tareas a la derecha */
 
 body {
   display: flex;
@@ -54,11 +7,6 @@ body {
   width: 100%;
   height: 100%;
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 15px;
-  -webkit-font-smoothing: antialiased;
 }
 
 .main {
@@ -96,52 +44,11 @@ body {
   color: var(--text-muted);
 }
 
-/* Botón de tema */
-.theme-button {
+/* Acciones de la cabecera: marcadores y tema */
+.header__actions {
   flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.theme-button:hover {
-  background: var(--hover-layer);
-  color: var(--text);
-}
-
-.theme-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.theme-button .icon {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-}
-
-/* Se muestra el icono del tema al que se cambiará */
-.icon--sun {
-  display: none;
-}
-
-:root[data-theme="dark"] .icon--sun {
-  display: block;
-}
-
-:root[data-theme="dark"] .icon--moon {
-  display: none;
+  display: flex;
+  gap: 2px;
 }
 
 /* Riel de proyectos: columna vertical de iconos, al estilo Discord */

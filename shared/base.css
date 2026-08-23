@@ -1,0 +1,111 @@
+/*
+ * Reset, paleta y controles comunes a todas las vistas de la extensión
+ * (panel lateral de tareas y ventana de marcadores).
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tema claro (por defecto) */
+:root {
+  --bg: #ffffff;
+  --rail-bg: #f1f1f2;
+  --pill: #dcdcdc;
+  --pill-hover: #d2d2d2;
+  --text: #101010;
+  --text-muted: #8b8b8b;
+  --accent: #2b7cf6;
+  --accent-hover: #1a6ae8;
+  --danger: #d24b4b;
+  --danger-hover: #b83b3b;
+  --hover-layer: rgba(0, 0, 0, 0.06);
+}
+
+/* Tema oscuro por preferencia del sistema (mientras no se fije uno a mano) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1d20;
+    --rail-bg: #151619;
+    --pill: #2b2d31;
+    --pill-hover: #34363b;
+    --text: #f2f3f5;
+    --text-muted: #8b8f96;
+    --hover-layer: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* Tema oscuro elegido a mano: gana sobre el del sistema */
+:root[data-theme="dark"] {
+  --bg: #1c1d20;
+  --rail-bg: #151619;
+  --pill: #2b2d31;
+  --pill-hover: #34363b;
+  --text: #f2f3f5;
+  --text-muted: #8b8f96;
+  --hover-layer: rgba(255, 255, 255, 0.08);
+}
+
+html {
+  background: var(--bg);
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Botón redondo de icono, base de las acciones de cabecera */
+.icon-button {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.icon-button:hover {
+  background: var(--hover-layer);
+  color: var(--text);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.icon-button .icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Se muestra el icono del tema al que se cambiará */
+.icon--sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .icon--sun {
+  display: block;
+}
+
+:root[data-theme="dark"] .icon--moon {
+  display: none;
+}

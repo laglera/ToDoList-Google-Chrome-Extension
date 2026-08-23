@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "__MSG_extDescription__",
   "default_locale": "es",
-  "permissions": ["storage", "sidePanel"],
+  "permissions": ["storage", "sidePanel", "bookmarks", "favicon"],
   "background": {
     "service_worker": "background.js"
   },

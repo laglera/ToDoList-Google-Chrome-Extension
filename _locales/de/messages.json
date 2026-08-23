@@ -4,7 +4,7 @@
     "description": "Name der Erweiterung"
   },
   "extDescription": {
-    "message": "Verwalte deine Aufgabenliste direkt im Browser."
+    "message": "Verwalte deine Aufgabenliste und deine Lesezeichen direkt im Browser."
   },
   "appTitle": {
     "message": "Meine Aufgaben"
@@ -91,5 +91,110 @@
   },
   "save": {
     "message": "Speichern"
+  },
+  "openBookmarks": {
+    "message": "Lesezeichen ansehen"
+  },
+  "bookmarksTitle": {
+    "message": "Lesezeichen"
+  },
+  "foldersLabel": {
+    "message": "Ordner"
+  },
+  "breadcrumbLabel": {
+    "message": "Pfad"
+  },
+  "toggleView": {
+    "message": "Ansicht wechseln"
+  },
+  "searchPlaceholder": {
+    "message": "Lesezeichen durchsuchen…"
+  },
+  "searchResults": {
+    "message": "Suchergebnisse"
+  },
+  "showMore": {
+    "message": "Mehr anzeigen"
+  },
+  "expandFolder": {
+    "message": "Ausklappen"
+  },
+  "collapseFolder": {
+    "message": "Einklappen"
+  },
+  "openInNewTab": {
+    "message": "In neuem Tab öffnen"
+  },
+  "copyUrl": {
+    "message": "Adresse kopieren"
+  },
+  "rename": {
+    "message": "Umbenennen"
+  },
+  "delete": {
+    "message": "Löschen"
+  },
+  "foldersHeading": {
+    "message": "Ordner"
+  },
+  "bookmarksHeading": {
+    "message": "Lesezeichen"
+  },
+  "emptyFolder": {
+    "message": "Dieser Ordner ist leer."
+  },
+  "noResults": {
+    "message": "Keine passenden Lesezeichen."
+  },
+  "resultOne": {
+    "message": "$COUNT$ Ergebnis",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "resultMany": {
+    "message": "$COUNT$ Ergebnisse",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemOne": {
+    "message": "$COUNT$ Lesezeichen",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemMany": {
+    "message": "$COUNT$ Lesezeichen",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDeleteFolder": {
+    "message": "„$NAME$“ und die enthaltenen $COUNT$ Lesezeichen löschen?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "confirmDeleteEmptyFolder": {
+    "message": "Ordner „$NAME$“ löschen?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }

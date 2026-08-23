@@ -1,8 +1,10 @@
 "use strict";
 
+import { msg, applyI18n } from "./shared/i18n.js";
+import { setupTheme } from "./shared/theme.js";
+
 const STORAGE_KEY = "tasks";
 const PROJECTS_KEY = "projects";
-const THEME_KEY = "theme";
 
 /** Id especial del filtro "Todas" (no es un proyecto real) */
 const ALL_ID = "__all__";
@@ -14,6 +16,7 @@ const counter = document.getElementById("counter");
 const emptyState = document.getElementById("empty-state");
 const template = document.getElementById("task-template");
 const themeButton = document.getElementById("theme-button");
+const bookmarksButton = document.getElementById("bookmarks-button");
 const projectsNav = document.getElementById("projects");
 const railIconTemplate = document.getElementById("rail-icon-template");
 const projectEditTemplate = document.getElementById("project-edit-template");
@@ -26,45 +29,6 @@ let projects = [];
 
 /** Proyecto activo: ALL_ID, null (sin proyecto) o el id de un proyecto */
 let selectedProjectId = ALL_ID;
-
-/** Tema elegido a mano ("light" | "dark"), o null si se sigue al sistema */
-let theme = null;
-
-const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
-
-/* --- Idioma --- */
-
-/**
- * Devuelve el mensaje traducido, o `fallback` si no hay traducción.
- * getMessage se llama sin el segundo argumento cuando no hay sustituciones:
- * pasarle un array vacío puede devolver cadena vacía.
- */
-function msg(key, fallback = "", ...substitutions) {
-  const text = substitutions.length
-    ? chrome.i18n.getMessage(key, substitutions)
-    : chrome.i18n.getMessage(key);
-
-  if (text) return text;
-  console.warn(`i18n: falta el mensaje "${key}"; se usa el texto por defecto`);
-  return fallback;
-}
-
-/**
- * Traduce el marcado: data-i18n rellena el texto y data-i18n-<attr> el atributo.
- * El texto que ya trae el HTML hace de red de seguridad, así que la interfaz
- * nunca queda en blanco aunque falte una traducción.
- */
-function applyI18n(root = document) {
-  for (const el of root.querySelectorAll("[data-i18n]")) {
-    el.textContent = msg(el.dataset.i18n, el.textContent);
-  }
-  for (const attr of ["placeholder", "title", "aria-label"]) {
-    const dataAttr = `data-i18n-${attr}`;
-    for (const el of root.querySelectorAll(`[${dataAttr}]`)) {
-      el.setAttribute(attr, msg(el.getAttribute(dataAttr), el.getAttribute(attr) ?? ""));
-    }
-  }
-}
 
 /* --- Persistencia --- */
 
@@ -86,30 +50,6 @@ async function loadProjects() {
 
 async function saveProjects() {
   await chrome.storage.local.set({ [PROJECTS_KEY]: projects });
-}
-
-/* --- Tema --- */
-
-async function loadTheme() {
-  const data = await chrome.storage.local.get(THEME_KEY);
-  theme = data[THEME_KEY] === "light" || data[THEME_KEY] === "dark" ? data[THEME_KEY] : null;
-}
-
-/** Deja siempre un data-theme explícito para que el icono refleje el tema real */
-function applyTheme() {
-  const effective = theme ?? (systemDark.matches ? "dark" : "light");
-  document.documentElement.dataset.theme = effective;
-  themeButton.title =
-    effective === "dark"
-      ? msg("themeToLight", "Cambiar a tema claro")
-      : msg("themeToDark", "Cambiar a tema oscuro");
-  themeButton.setAttribute("aria-label", themeButton.title);
-}
-
-async function toggleTheme() {
-  theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  applyTheme();
-  await chrome.storage.local.set({ [THEME_KEY]: theme });
 }
 
 /* --- Acciones --- */
@@ -713,11 +653,9 @@ projectsNav.addEventListener("click", (event) => {
   if (select) selectProject(select.closest(".rail-icon").dataset.id);
 });
 
-themeButton.addEventListener("click", toggleTheme);
-
-// Mientras no haya un tema elegido a mano, se sigue al del sistema en vivo
-systemDark.addEventListener("change", () => {
-  if (theme === null) applyTheme();
+// La ventana de marcadores la abre el service worker: así hay una sola, y la reutiliza
+bookmarksButton.addEventListener("click", () => {
+  chrome.runtime.sendMessage({ type: "open-bookmarks" }).catch(console.error);
 });
 
 // Mantiene el panel sincronizado si el storage cambia desde otra ventana
@@ -738,12 +676,6 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
     render();
   }
-
-  if (changes[THEME_KEY]) {
-    const value = changes[THEME_KEY].newValue;
-    theme = value === "light" || value === "dark" ? value : null;
-    applyTheme();
-  }
 });
 
 /* --- Arranque --- */
@@ -752,8 +684,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   document.documentElement.lang = chrome.i18n.getUILanguage();
   applyI18n();
 
-  await loadTheme();
-  applyTheme();
+  await setupTheme(themeButton);
   await Promise.all([loadTasks(), loadProjects()]);
   render();
   input.focus();

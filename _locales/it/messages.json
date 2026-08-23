@@ -4,7 +4,7 @@
     "description": "Nome dell'estensione"
   },
   "extDescription": {
-    "message": "Gestisci la tua lista di cose da fare direttamente dal browser."
+    "message": "Gestisci la tua lista di cose da fare e i tuoi preferiti direttamente dal browser."
   },
   "appTitle": {
     "message": "Le mie attività"
@@ -91,5 +91,110 @@
   },
   "save": {
     "message": "Salva"
+  },
+  "openBookmarks": {
+    "message": "Vedi i preferiti"
+  },
+  "bookmarksTitle": {
+    "message": "Preferiti"
+  },
+  "foldersLabel": {
+    "message": "Cartelle"
+  },
+  "breadcrumbLabel": {
+    "message": "Percorso"
+  },
+  "toggleView": {
+    "message": "Cambia vista"
+  },
+  "searchPlaceholder": {
+    "message": "Cerca nei preferiti…"
+  },
+  "searchResults": {
+    "message": "Risultati della ricerca"
+  },
+  "showMore": {
+    "message": "Mostra altri"
+  },
+  "expandFolder": {
+    "message": "Espandi"
+  },
+  "collapseFolder": {
+    "message": "Comprimi"
+  },
+  "openInNewTab": {
+    "message": "Apri in una nuova scheda"
+  },
+  "copyUrl": {
+    "message": "Copia indirizzo"
+  },
+  "rename": {
+    "message": "Rinomina"
+  },
+  "delete": {
+    "message": "Elimina"
+  },
+  "foldersHeading": {
+    "message": "Cartelle"
+  },
+  "bookmarksHeading": {
+    "message": "Preferiti"
+  },
+  "emptyFolder": {
+    "message": "Questa cartella è vuota."
+  },
+  "noResults": {
+    "message": "Nessun preferito corrisponde."
+  },
+  "resultOne": {
+    "message": "$COUNT$ risultato",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "resultMany": {
+    "message": "$COUNT$ risultati",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemOne": {
+    "message": "$COUNT$ preferito",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemMany": {
+    "message": "$COUNT$ preferiti",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "confirmDeleteFolder": {
+    "message": "Eliminare «$NAME$» e i suoi $COUNT$ preferiti?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      },
+      "count": {
+        "content": "$2"
+      }
+    }
+  },
+  "confirmDeleteEmptyFolder": {
+    "message": "Eliminare la cartella «$NAME$»?",
+    "placeholders": {
+      "name": {
+        "content": "$1"
+      }
+    }
   }
 }
